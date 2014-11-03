@@ -16,9 +16,13 @@ module.exports = class Datepicker extends ViewHelpers
   create: (model, dom) ->
     global.moment = moment
     dom.on "click", (e) =>
-      model.set "show", true if @parent.contains(e.target)
+      if @parent.contains(e.target)
+        model.set "show", true, =>
+          @emit "show"
     dom.on "mousedown", (e) =>
-      model.set "show", false unless @parent.contains(e.target)
+      unless @parent.contains(e.target)
+        model.set "show", false, => 
+          @emit "cancel"
 
   gotoMonthView: (date) ->
     @setCurrentDate date
@@ -82,9 +86,10 @@ module.exports = class Datepicker extends ViewHelpers
     selectedMonth = date.month()
     currentDate = moment(@getCurrentDate())
     currentMonth = currentDate.month()
-    @gotoMonthView date  if selectedMonth isnt currentMonth
-    @model.set "active", selectedDate.fullDate
-    @model.set "show", false
+    @emitDelayable "select", =>
+      @gotoMonthView date  if selectedMonth isnt currentMonth
+      @model.set "active", selectedDate.fullDate
+      @model.set "show", false
 
   prevMonth: ->
     # get current month
