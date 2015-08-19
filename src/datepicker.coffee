@@ -10,7 +10,7 @@ module.exports = class Datepicker extends ViewHelpers
   init: (model) ->
     @lang = model.get("lang") || "en"
     @builders = new Builders(@lang, moment)
-    currentDate = moment()
+    currentDate = model.get("active") || moment()
     @gotoMonthView currentDate
   
   create: (model, dom) ->
